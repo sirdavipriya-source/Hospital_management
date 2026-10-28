@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}Medical Departments - MedCare Hospital{% endblock %}
+
+{% block content %}
+<section class="bg-primary text-white py-5 mb-4">
+    <div class="container text-center">
+        <h1 class="fw-extrabold display-4 mb-2">Our Specialized Medical Departments</h1>
+        <p class="lead opacity-90 mb-0">Multi-disciplinary clinical centers staffed by certified medical experts</p>
+    </div>
+</section>
+
+<div class="container py-4">
+    <!-- Search Bar -->
+    <div class="row justify-content-center mb-5">
+        <div class="col-md-8">
+            <form method="GET" action="{% url 'department_list' %}" class="d-flex gap-2">
+                <div class="input-group input-group-lg shadow-sm">
+                    <span class="input-group-text bg-white"><i class="fa-solid fa-magnifying-glass text-muted"></i></span>
+                    <input type="text" name="search" class="form-control border-start-0" placeholder="Search department name or condition..." value="{{ search_query }}">
+                </div>
+                <button type="submit" class="btn btn-primary btn-lg px-4">Search</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Department Grid -->
+    <div class="row g-4">
+        {% for dept in departments %}
+        <div class="col-lg-4 col-md-6">
+            <div class="medical-card">
+                <div class="position-relative">
+                    <img src="{{ dept.get_image }}" alt="{{ dept.name }}" class="w-100" style="height: 200px; object-fit: cover;">
+                    <div class="position-absolute top-0 end-0 m-3 bg-white px-3 py-1 rounded-pill shadow-sm small font-weight-bold text-primary">
+                        <i class="fa-solid fa-user-md me-1"></i> {{ dept.doctor_count }} Doctors
+                    </div>
+                </div>
+                <div class="p-4">
+                    <div class="d-flex align-items-center gap-3 mb-2">
+                        <div class="icon-box-lg mb-0" style="width: 48px; height: 48px; font-size: 1.3rem;">
+                            <i class="fa-solid {{ dept.icon_class }}"></i>
+                        </div>
+                        <h4 class="fw-bold mb-0">{{ dept.name }}</h4>
+                    </div>
+                    <p class="text-muted small mb-3">{{ dept.description }}</p>
+                    
+                    <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                        <a href="{% url 'department_detail' dept.id %}" class="btn btn-sm btn-outline-primary">
+                            View Department & Doctors <i class="fa-solid fa-arrow-right ms-1"></i>
+                        </a>
+                        <a href="{% url 'book_appointment' %}?department={{ dept.id }}" class="btn btn-sm btn-primary">
+                            Book <i class="fa-solid fa-calendar-plus ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center py-5">
+            <i class="fa-solid fa-hospital-user fs-1 text-muted mb-3 d-block"></i>
+            <h5 class="text-muted">No medical departments match your query.</h5>
+            <a href="{% url 'department_list' %}" class="btn btn-outline-primary mt-2">Reset Filters</a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

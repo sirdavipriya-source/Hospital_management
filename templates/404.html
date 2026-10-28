@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block title %}Page Not Found (404) - MedCare{% endblock %}
+
+{% block content %}
+<div class="container py-5 text-center my-5">
+    <div class="display-1 fw-extrabold text-primary mb-2">404</div>
+    <h2 class="fw-bold mb-3">Medical Record or Page Not Found</h2>
+    <p class="text-muted fs-5 mb-4 max-w-500 mx-auto">The requested page or resource could not be located on the MedCare server. It may have been moved or updated.</p>
+    <a href="{% url 'home' %}" class="btn btn-primary btn-lg shadow">
+        <i class="fa-solid fa-house me-2"></i> Return to Safety Home
+    </a>
+</div>
+{% endblock %}

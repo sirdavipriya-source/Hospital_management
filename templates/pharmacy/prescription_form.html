@@ -1,0 +1,192 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }} - MedCare Clinical{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+    {% include 'includes/admin_sidebar.html' %}
+
+    <div class="dashboard-content">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 bg-white">
+                    <div class="d-flex align-items-center justify-content-between mb-4 pb-3 border-bottom">
+                        <div>
+                            <h4 class="fw-bold mb-1 text-dark">
+                                <i class="fa-solid fa-file-prescription text-warning me-2"></i>{{ title }}
+                            </h4>
+                            <p class="text-muted small mb-0">Enter patient diagnosis, doctor, and add multiple medicines with dosages.</p>
+                        </div>
+                        <a href="{% url 'prescription_list' %}" class="btn btn-outline-secondary btn-sm">
+                            <i class="fa-solid fa-arrow-left me-1"></i> Back to Prescriptions
+                        </a>
+                    </div>
+
+                    <form method="POST" id="prescriptionForm">
+                        {% csrf_token %}
+
+                        <!-- Section 1: Patient Information -->
+                        <div class="mb-4">
+                            <h6 class="fw-bold text-uppercase small text-primary mb-3">1. Patient Information</h6>
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">Patient Full Name <span class="text-danger">*</span></label>
+                                    {{ form.patient_name }}
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label fw-semibold">Patient ID / MRN</label>
+                                    {{ form.patient_id_number }}
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label fw-semibold">Age</label>
+                                    {{ form.patient_age }}
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label fw-semibold">Gender</label>
+                                    {{ form.patient_gender }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Section 2: Clinical Details -->
+                        <div class="mb-4">
+                            <h6 class="fw-bold text-uppercase small text-primary mb-3">2. Doctor & Clinical Consultation</h6>
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">Prescribing Doctor <span class="text-danger">*</span></label>
+                                    {{ form.doctor }}
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">Department</label>
+                                    {{ form.department }}
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">Prescription Date <span class="text-danger">*</span></label>
+                                    {{ form.prescription_date }}
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label fw-semibold">Clinical Diagnosis & Findings <span class="text-danger">*</span></label>
+                                    {{ form.diagnosis }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Section 3: Prescribed Medicines Formset (Multi-Medicine) -->
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h6 class="fw-bold text-uppercase small text-primary mb-0">3. Prescribed Medicines & Dosages</h6>
+                                <button type="button" class="btn btn-sm btn-outline-primary" id="addMedicineBtn">
+                                    <i class="fa-solid fa-plus me-1"></i> Add Another Medicine
+                                </button>
+                            </div>
+
+                            {{ formset.management_form }}
+
+                            <div class="table-responsive">
+                                <table class="table table-bordered align-middle" id="medicineTable">
+                                    <thead class="bg-light">
+                                        <tr>
+                                            <th style="width: 28%;">Medicine <span class="text-danger">*</span></th>
+                                            <th style="width: 15%;">Dosage</th>
+                                            <th style="width: 15%;">Frequency</th>
+                                            <th style="width: 12%;">Duration</th>
+                                            <th style="width: 10%;">Qty</th>
+                                            <th style="width: 15%;">Instructions</th>
+                                            <th style="width: 5%;" class="text-center">Del</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="medicineTableBody">
+                                        {% for item_form in formset %}
+                                        <tr class="medicine-row">
+                                            <td>
+                                                {{ item_form.id }}
+                                                {{ item_form.medicine }}
+                                            </td>
+                                            <td>{{ item_form.dosage }}</td>
+                                            <td>{{ item_form.frequency }}</td>
+                                            <td>{{ item_form.duration }}</td>
+                                            <td>{{ item_form.quantity }}</td>
+                                            <td>{{ item_form.instructions }}</td>
+                                            <td class="text-center">
+                                                {% if item_form.instance.pk %}
+                                                    {{ item_form.DELETE }}
+                                                {% else %}
+                                                    <button type="button" class="btn btn-sm btn-outline-danger remove-row-btn"><i class="fa-solid fa-xmark"></i></button>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Section 4: Doctor Advice -->
+                        <div class="mb-4">
+                            <h6 class="fw-bold text-uppercase small text-primary mb-2">4. Advice, Precautions & Follow-up</h6>
+                            {{ form.notes }}
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary px-4 py-2"><i class="fa-solid fa-save me-1"></i> Save & Generate Prescription</button>
+                            <a href="{% url 'prescription_list' %}" class="btn btn-light px-4">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const addBtn = document.getElementById('addMedicineBtn');
+    const tableBody = document.getElementById('medicineTableBody');
+    const totalForms = document.getElementById('id_items-TOTAL_FORMS');
+
+    if (addBtn && tableBody && totalForms) {
+        addBtn.addEventListener('click', function() {
+            let currentCount = parseInt(totalForms.value);
+            let firstRow = tableBody.querySelector('.medicine-row');
+            if (firstRow) {
+                let newRow = firstRow.cloneNode(true);
+                // Clear input values and update form indexes
+                newRow.querySelectorAll('input, select').forEach(function(input) {
+                    if (input.type !== 'hidden' || input.name.includes('items-')) {
+                        let name = input.name.replace(/items-\d+-/, `items-${currentCount}-`);
+                        let id = input.id.replace(/id_items-\d+-/, `id_items-${currentCount}-`);
+                        input.name = name;
+                        input.id = id;
+                        if (input.type === 'text' || input.type === 'number') {
+                            input.value = '';
+                        }
+                    }
+                });
+                
+                // Add remove listener
+                let delBtn = newRow.querySelector('.remove-row-btn');
+                if (delBtn) {
+                    delBtn.addEventListener('click', function() {
+                        newRow.remove();
+                    });
+                }
+                
+                tableBody.appendChild(newRow);
+                totalForms.value = currentCount + 1;
+            }
+        });
+    }
+
+    // Attach listeners for initial remove buttons
+    document.querySelectorAll('.remove-row-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            if (document.querySelectorAll('.medicine-row').length > 1) {
+                this.closest('.medicine-row').remove();
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

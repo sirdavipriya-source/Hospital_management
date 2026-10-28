@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete Department - MedCare Admin{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="medical-card p-4 text-center">
+                <i class="fa-solid fa-triangle-exclamation text-danger display-3 mb-3"></i>
+                <h3 class="fw-bold mb-2">Delete Department?</h3>
+                <p class="text-muted mb-4">Are you sure you want to permanently delete department <strong>"{{ department.name }}"</strong>? All linked doctor associations will be unlinked.</p>
+
+                <form method="POST" action="">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger btn-lg px-4 me-2">
+                        <i class="fa-solid fa-trash me-2"></i> Yes, Delete Department
+                    </button>
+                    <a href="{% url 'department_admin' %}" class="btn btn-light btn-lg">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

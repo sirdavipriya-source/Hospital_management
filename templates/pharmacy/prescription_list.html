@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+
+{% block title %}Prescriptions (Rx) Management - MedCare Admin{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+    {% include 'includes/admin_sidebar.html' %}
+
+    <div class="dashboard-content">
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+            <div>
+                <h2 class="fw-bold mb-1"><i class="fa-solid fa-file-prescription text-warning me-2"></i>Prescription Management (Rx)</h2>
+                <p class="text-muted mb-0">Create, review, and print patient medical prescriptions with multi-item dosages.</p>
+            </div>
+            <div>
+                <a href="{% url 'prescription_create' %}" class="btn btn-primary">
+                    <i class="fa-solid fa-plus me-1"></i> Create New Prescription
+                </a>
+            </div>
+        </div>
+
+        <!-- Filter & Search Bar -->
+        <div class="filter-card">
+            <form method="GET" class="row g-2 align-items-center">
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-search text-muted"></i></span>
+                        <input type="text" name="search" class="form-control border-start-0" placeholder="Search patient name, Rx ID, diagnosis..." value="{{ search_query }}">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <select name="doctor" class="form-select" onchange="this.form.submit()">
+                        <option value="">-- All Doctors --</option>
+                        {% for doc in doctors %}
+                        <option value="{{ doc.id }}" {% if selected_doctor == doc.id|stringformat:"s" %}selected{% endif %}>
+                            Dr. {{ doc.name }} ({{ doc.department.name|default:"General" }})
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <input type="date" name="date" class="form-control" value="{{ date_filter }}" onchange="this.form.submit()" placeholder="Filter by date">
+                </div>
+                <div class="col-md-2 d-flex gap-1">
+                    <button type="submit" class="btn btn-dark w-100"><i class="fa-solid fa-filter me-1"></i> Filter</button>
+                    {% if search_query or selected_doctor or date_filter %}
+                    <a href="{% url 'prescription_list' %}" class="btn btn-outline-secondary" title="Clear Filters"><i class="fa-solid fa-rotate-left"></i></a>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+
+        <!-- Stored Prescriptions Table -->
+        <div class="table-custom">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Rx ID</th>
+                            <th>Patient Information</th>
+                            <th>Doctor & Department</th>
+                            <th>Date</th>
+                            <th>Prescribed Medicines</th>
+                            <th>Status</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for rx in prescriptions %}
+                        <tr>
+                            <td>
+                                <span class="fw-bold text-primary">{{ rx.prescription_id|default:rx.id }}</span>
+                            </td>
+                            <td>
+                                <div class="fw-bold text-dark">{{ rx.patient_name }}</div>
+                                <small class="text-muted">
+                                    {% if rx.patient_id_number %}ID: {{ rx.patient_id_number }} | {% endif %}
+                                    {% if rx.patient_age %}{{ rx.patient_age }} yrs{% endif %}
+                                    {% if rx.patient_gender %}, {{ rx.patient_gender }}{% endif %}
+                                </small>
+                            </td>
+                            <td>
+                                <div class="fw-semibold text-dark">Dr. {{ rx.doctor.name }}</div>
+                                <small class="text-muted">{{ rx.department.name|default:rx.doctor.department.name }}</small>
+                            </td>
+                            <td>
+                                <div class="small fw-semibold">{{ rx.prescription_date }}</div>
+                            </td>
+                            <td>
+                                <div class="d-flex flex-wrap gap-1">
+                                    {% for item in rx.items.all %}
+                                    <span class="badge bg-light text-dark border">
+                                        {{ item.medicine.name }} ({{ item.frequency }})
+                                    </span>
+                                    {% empty %}
+                                    <small class="text-muted">No items</small>
+                                    {% endfor %}
+                                </div>
+                            </td>
+                            <td>
+                                {% if rx.status == 'Active' %}
+                                    <span class="badge-status active"><i class="fa-solid fa-check"></i> Active</span>
+                                {% else %}
+                                    <span class="badge-status completed">{{ rx.status }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end">
+                                <a href="{% url 'prescription_detail' rx.id %}" class="btn btn-sm btn-outline-success me-1" title="View & Print Prescription Slip">
+                                    <i class="fa-solid fa-print"></i>
+                                </a>
+                                <a href="{% url 'prescription_update' rx.id %}" class="btn btn-sm btn-outline-primary me-1" title="Edit">
+                                    <i class="fa-solid fa-pen-to-square"></i>
+                                </a>
+                                <a href="{% url 'prescription_delete' rx.id %}" class="btn btn-sm btn-outline-danger" title="Delete">
+                                    <i class="fa-solid fa-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center py-5 text-muted">
+                                <i class="fa-solid fa-file-prescription fs-1 mb-2 text-secondary opacity-50"></i>
+                                <p class="mb-1 fw-semibold">No prescriptions found matching criteria.</p>
+                                <small>Create patient prescriptions using the button above.</small>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

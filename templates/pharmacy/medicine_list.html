@@ -1,0 +1,268 @@
+{% extends 'base.html' %}
+
+{% block title %}Pharmacy & Medicine Inventory - MedCare Admin{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+    {% include 'includes/admin_sidebar.html' %}
+
+    <div class="dashboard-content">
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+            <div>
+                <h2 class="fw-bold mb-1"><i class="fa-solid fa-pills text-danger me-2"></i>Pharmacy & Medicine Management</h2>
+                <p class="text-muted mb-0">Track pharmaceutical stock levels, expiry dates, dosage units, and batch numbers.</p>
+            </div>
+            <div class="d-flex gap-2">
+                <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
+                    <i class="fa-solid fa-folder-plus me-1"></i> New Category
+                </button>
+                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#addMedicineModal">
+                    <i class="fa-solid fa-plus me-1"></i> Add Medicine
+                </button>
+            </div>
+        </div>
+
+        <!-- Inventory Metrics Counters -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-3 col-6">
+                <div class="stat-card" style="border-left-color: #0d9488;">
+                    <div class="stat-label">Total Medicines</div>
+                    <div class="stat-number">{{ total_meds }}</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="stat-card stat-warning">
+                    <div class="stat-label">Low Stock (<15 Units)</div>
+                    <div class="stat-number text-warning">{{ low_stock_count }}</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="stat-card stat-danger">
+                    <div class="stat-label">Expired Medicines</div>
+                    <div class="stat-number text-danger">{{ expired_count }}</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="stat-card" style="border-left-color: #64748b;">
+                    <div class="stat-label">Out of Stock</div>
+                    <div class="stat-number text-muted">{{ out_stock_count }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter & Search Bar -->
+        <div class="filter-card">
+            <form method="GET" class="row g-2 align-items-center">
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-search text-muted"></i></span>
+                        <input type="text" name="search" class="form-control border-start-0" placeholder="Search medicine, generic name, batch..." value="{{ search_query }}">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <select name="category" class="form-select" onchange="this.form.submit()">
+                        <option value="">-- All Categories --</option>
+                        {% for cat in categories %}
+                        <option value="{{ cat.id }}" {% if selected_category == cat.id|stringformat:"s" %}selected{% endif %}>
+                            {{ cat.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select name="status" class="form-select" onchange="this.form.submit()">
+                        <option value="">-- All Stock Status --</option>
+                        <option value="in_stock" {% if status_filter == 'in_stock' %}selected{% endif %}>In Stock</option>
+                        <option value="low_stock" {% if status_filter == 'low_stock' %}selected{% endif %}>Low Stock (&lt; 15)</option>
+                        <option value="expired" {% if status_filter == 'expired' %}selected{% endif %}>Expired</option>
+                        <option value="out_of_stock" {% if status_filter == 'out_of_stock' %}selected{% endif %}>Out of Stock (0)</option>
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex gap-1">
+                    <button type="submit" class="btn btn-dark w-100"><i class="fa-solid fa-filter me-1"></i> Filter</button>
+                    {% if search_query or selected_category or status_filter %}
+                    <a href="{% url 'medicine_list' %}" class="btn btn-outline-secondary" title="Clear Filters"><i class="fa-solid fa-rotate-left"></i></a>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+
+        <!-- Stored Medicines Table -->
+        <div class="table-custom">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Medicine ID</th>
+                            <th>Medicine & Generic Name</th>
+                            <th>Category</th>
+                            <th>Stock Units</th>
+                            <th>Unit Price</th>
+                            <th>Batch & Expiry</th>
+                            <th>Status</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for med in medicines %}
+                        <tr>
+                            <td>
+                                <span class="fw-bold text-danger">{{ med.medicine_id|default:med.id }}</span>
+                            </td>
+                            <td>
+                                <div class="fw-bold text-dark">{{ med.name }}</div>
+                                <small class="text-muted">{{ med.generic_name|default:med.manufacturer }}</small>
+                            </td>
+                            <td>
+                                <span class="badge bg-secondary-subtle text-secondary px-2 py-1">
+                                    {{ med.category.name|default:med.category_name|default:"General" }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="fw-bold {% if med.quantity == 0 %}text-danger{% elif med.quantity < 15 %}text-warning{% else %}text-success{% endif %} fs-6">
+                                    {{ med.quantity }} Units
+                                </span>
+                            </td>
+                            <td>
+                                <span class="fw-semibold text-dark">${{ med.unit_price|floatformat:2 }}</span>
+                            </td>
+                            <td>
+                                <div class="small fw-semibold text-dark">{{ med.batch_number|default:"N/A" }}</div>
+                                <small class="{% if med.is_expired %}text-danger fw-bold{% else %}text-muted{% endif %}">
+                                    Exp: {{ med.expiry_date|default:"N/A" }}
+                                </small>
+                            </td>
+                            <td>
+                                {% if med.is_expired %}
+                                    <span class="badge-status expired"><i class="fa-solid fa-skull-crossbones"></i> Expired</span>
+                                {% elif med.quantity == 0 %}
+                                    <span class="badge-status out_of_stock"><i class="fa-solid fa-ban"></i> Out of Stock</span>
+                                {% elif med.quantity < 15 %}
+                                    <span class="badge-status low_stock"><i class="fa-solid fa-triangle-exclamation"></i> Low Stock</span>
+                                {% else %}
+                                    <span class="badge-status in_stock"><i class="fa-solid fa-check"></i> In Stock</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end">
+                                <a href="{% url 'medicine_update' med.id %}" class="btn btn-sm btn-outline-primary me-1" title="Edit">
+                                    <i class="fa-solid fa-pen-to-square"></i>
+                                </a>
+                                <a href="{% url 'medicine_delete' med.id %}" class="btn btn-sm btn-outline-danger" title="Delete">
+                                    <i class="fa-solid fa-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="8" class="text-center py-5 text-muted">
+                                <i class="fa-solid fa-pills fs-1 mb-2 text-secondary opacity-50"></i>
+                                <p class="mb-1 fw-semibold">No medicines found matching criteria.</p>
+                                <small>Add medicines to inventory using the button above.</small>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Modal: Add Medicine (Direct DB Save) -->
+<div class="modal fade" id="addMedicineModal" tabindex="-1" aria-labelledby="addMedLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content rounded-4 border-0 shadow-lg">
+            <div class="modal-header bg-danger text-white rounded-top-4">
+                <h5 class="modal-title fw-bold" id="addMedLabel">
+                    <i class="fa-solid fa-plus-circle me-2"></i>Add Medicine to Inventory
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="{% url 'medicine_create' %}">
+                {% csrf_token %}
+                <div class="modal-body p-4">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Medicine Brand Name <span class="text-danger">*</span></label>
+                            {{ form.name }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Generic / Chemical Name</label>
+                            {{ form.generic_name }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Medicine ID / Code</label>
+                            {{ form.medicine_id }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Category</label>
+                            {{ form.category }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Manufacturer / Brand</label>
+                            {{ form.manufacturer }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Batch Number</label>
+                            {{ form.batch_number }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Quantity / Units <span class="text-danger">*</span></label>
+                            {{ form.quantity }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Unit Price ($) <span class="text-danger">*</span></label>
+                            {{ form.unit_price }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Expiry Date</label>
+                            {{ form.expiry_date }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Description & Indications</label>
+                            {{ form.description }}
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light rounded-bottom-4">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger px-4"><i class="fa-solid fa-save me-1"></i> Save Medicine</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Add Category -->
+<div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCatLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow-lg">
+            <div class="modal-header bg-secondary text-white rounded-top-4">
+                <h5 class="modal-title fw-bold" id="addCatLabel">
+                    <i class="fa-solid fa-folder-plus me-2"></i>Add Medicine Category
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="{% url 'category_create' %}">
+                {% csrf_token %}
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Category Name <span class="text-danger">*</span></label>
+                        {{ category_form.name }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Description</label>
+                        {{ category_form.description }}
+                    </div>
+                </div>
+                <div class="modal-footer bg-light rounded-bottom-4">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-secondary px-4">Create Category</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

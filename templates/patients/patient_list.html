@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block title %}Patient List - MedCare Admin{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold mb-0"><i class="fa-solid fa-users text-primary me-2"></i> Patient Directory</h2>
+        <a href="{% url 'doctor_admin' %}" class="btn btn-outline-secondary">Back to Doctors</a>
+    </div>
+
+    <div class="medical-card p-3 mb-4">
+        <form method="GET" class="d-flex gap-2">
+            <input type="text" name="search" class="form-control" placeholder="Search by name, username or email..." value="{{ search_query }}">
+            <button type="submit" class="btn btn-primary px-4">Search</button>
+        </form>
+    </div>
+
+    {% if patients %}
+    <div class="medical-card overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="ps-4">#</th>
+                        <th>Patient Name</th>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Joined</th>
+                        <th class="pe-4">Records</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for patient in patients %}
+                    <tr>
+                        <td class="ps-4 text-muted small">{{ forloop.counter }}</td>
+                        <td><span class="fw-semibold">{{ patient.get_full_name|default:'—' }}</span></td>
+                        <td><span class="text-muted">{{ patient.username }}</span></td>
+                        <td><span class="text-muted small">{{ patient.email }}</span></td>
+                        <td><span class="small text-muted">{{ patient.date_joined|date:"d M Y" }}</span></td>
+                        <td class="pe-4">
+                            <a href="{% url 'medical_history' %}?patient_id={{ patient.id }}" class="btn btn-sm btn-outline-primary">
+                                <i class="fa-solid fa-file-medical me-1"></i> Records
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <i class="fa-solid fa-users-slash fs-1 text-muted mb-3 d-block"></i>
+        <h5 class="text-muted">No patients found.</h5>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

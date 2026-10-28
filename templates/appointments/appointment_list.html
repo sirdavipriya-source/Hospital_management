@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+
+{% block title %}My Appointments - MedCare{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
+        <h2 class="fw-bold mb-3 mb-md-0"><i class="fa-solid fa-calendar-check text-primary me-2"></i> Appointments</h2>
+        <a href="{% url 'book_appointment' %}" class="btn btn-primary">
+            <i class="fa-solid fa-calendar-plus me-2"></i> Book New Appointment
+        </a>
+    </div>
+
+    <!-- Filters -->
+    <div class="medical-card p-3 mb-4">
+        <form method="GET" action="" class="row g-2 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label fw-bold small">Status Filter</label>
+                <select name="status" class="form-select form-select-sm">
+                    <option value="">All Statuses</option>
+                    {% for val, label in status_choices %}
+                    <option value="{{ val }}" {% if status_filter == val %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label fw-bold small">Filter by Date</label>
+                <input type="date" name="date" class="form-control form-control-sm" value="{{ date_filter }}">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-bold small">Search</label>
+                <input type="text" name="search" class="form-control form-control-sm" placeholder="Doctor, department, reason..." value="{{ search_query }}">
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary btn-sm w-100">Filter</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Appointments Table -->
+    {% if appointments %}
+    <div class="medical-card overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0 align-middle">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="py-3 ps-4">#</th>
+                        <th>Patient</th>
+                        <th>Doctor</th>
+                        <th>Department</th>
+                        <th>Date & Time</th>
+                        <th>Reason</th>
+                        <th>Status</th>
+                        <th class="pe-4">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for appt in appointments %}
+                    <tr>
+                        <td class="ps-4 text-muted small">{{ appt.id }}</td>
+                        <td>
+                            <span class="fw-semibold">{{ appt.patient.get_full_name|default:appt.patient.username }}</span>
+                        </td>
+                        <td>
+                            <span class="text-primary fw-semibold">Dr. {{ appt.doctor.name }}</span>
+                        </td>
+                        <td><span class="text-muted small">{{ appt.department.name }}</span></td>
+                        <td>
+                            <span class="fw-semibold">{{ appt.appointment_date }}</span><br>
+                            <small class="text-muted">{{ appt.appointment_time|time:"h:i A" }}</small>
+                        </td>
+                        <td><span class="text-muted small">{{ appt.reason|truncatechars:35 }}</span></td>
+                        <td>
+                            <span class="badge-status {{ appt.status|lower }}">{{ appt.status }}</span>
+                        </td>
+                        <td class="pe-4">
+                            {% if is_patient and appt.status == 'Pending' %}
+                                <form method="POST" action="{% url 'update_appointment_status' appt.id %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="status" value="Cancelled">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Cancel this appointment?')">
+                                        <i class="fa-solid fa-times me-1"></i> Cancel
+                                    </button>
+                                </form>
+                            {% endif %}
+                            {% if is_doctor or is_admin %}
+                                <div class="d-flex gap-1">
+                                    {% if appt.status == 'Pending' %}
+                                    <form method="POST" action="{% url 'update_appointment_status' appt.id %}">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="status" value="Confirmed">
+                                        <button type="submit" class="btn btn-sm btn-success">Accept</button>
+                                    </form>
+                                    <form method="POST" action="{% url 'update_appointment_status' appt.id %}">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="status" value="Rejected">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">Reject</button>
+                                    </form>
+                                    {% endif %}
+                                    {% if appt.status == 'Confirmed' %}
+                                    <a href="{% url 'add_prescription' appt.id %}" class="btn btn-sm btn-primary">
+                                        <i class="fa-solid fa-notes-medical me-1"></i> Prescribe
+                                    </a>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <i class="fa-solid fa-calendar-xmark fs-1 text-muted mb-3 d-block"></i>
+        <h5 class="text-muted">No appointments found.</h5>
+        <a href="{% url 'book_appointment' %}" class="btn btn-primary mt-2">Book Your First Appointment</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

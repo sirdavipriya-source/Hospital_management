@@ -1,0 +1,343 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}MedCare Hospital - Your Health, Our Priority{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center py-5">
+            <div class="col-lg-8">
+                <span class="badge bg-light text-primary fw-bold text-uppercase px-3 py-2 mb-3 shadow-sm">
+                    <i class="fa-solid fa-hospital-user me-1"></i> Multi-Specialty Healthcare Excellence
+                </span>
+                <h1 class="hero-title mb-3">Your Health, Our Priority</h1>
+                <p class="hero-sub">
+                    Experience world-class healthcare powered by expert medical specialists, state-of-the-art diagnostic technology, and 24/7 compassionate emergency treatment.
+                </p>
+                <div class="d-flex flex-wrap gap-3 mt-4">
+                    <a href="{% url 'book_appointment' %}" class="btn btn-primary btn-lg shadow">
+                        <i class="fa-solid fa-calendar-plus me-2"></i> Book Appointment
+                    </a>
+                    <a href="{% url 'doctor_list' %}" class="btn btn-outline-light btn-lg">
+                        <i class="fa-solid fa-user-doctor me-2"></i> Find a Doctor
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 24/7 Support & Emergency Care Banner -->
+<section class="container mt-n4 position-relative z-3">
+    <div class="emergency-banner">
+        <div class="row align-items-center">
+            <div class="col-lg-8 mb-3 mb-lg-0">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="fs-1"><i class="fa-solid fa-truck-medical"></i></div>
+                    <div>
+                        <h3 class="fw-bold mb-1">24/7 Emergency Care & Ambulance Hotline</h3>
+                        <p class="mb-0 text-white-50">Immediate critical resuscitation, trauma surgery, and swift ambulance deployment.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 text-lg-end">
+                <a href="tel:+18005559911" class="btn btn-light btn-lg text-danger fw-bold shadow">
+                    <i class="fa-solid fa-phone me-2"></i> Call +1 (800) 555-9911
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- About Hospital Section -->
+<section class="py-5 mt-4">
+    <div class="container">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6">
+                <div class="position-relative">
+                    <img src="https://images.unsplash.com/photo-1586773860418-d37222d8fce3?auto=format&fit=crop&w=800&q=80" alt="Hospital Building" class="img-fluid rounded-4 shadow-lg">
+                    <div class="position-absolute bottom-0 start-0 bg-primary text-white p-4 rounded-4 m-3 shadow d-none d-sm-block">
+                        <h2 class="fw-extrabold mb-0">25+</h2>
+                        <p class="mb-0 fw-medium">Years of Medical Leadership</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <span class="text-primary fw-bold text-uppercase tracking-wider">About MedCare Center</span>
+                <h2 class="fw-bold fs-1 mt-2 mb-3">Comprehensive Healthcare Built Around Patient Well-being</h2>
+                <p class="text-muted fs-5 mb-4">
+                    MedCare Medical Center is a premier healthcare institution combining advanced medical research, compassionate care, and seamless digital health services.
+                </p>
+                <div class="row g-3">
+                    <div class="col-sm-6">
+                        <div class="d-flex align-items-center gap-3 p-3 bg-white rounded-3 shadow-sm border">
+                            <i class="fa-solid fa-user-md text-primary fs-3"></i>
+                            <div>
+                                <h6 class="mb-0 fw-bold">Qualified Doctors</h6>
+                                <small class="text-muted">150+ Certified Specialists</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="d-flex align-items-center gap-3 p-3 bg-white rounded-3 shadow-sm border">
+                            <i class="fa-solid fa-microscope text-primary fs-3"></i>
+                            <div>
+                                <h6 class="mb-0 fw-bold">Modern Diagnostics</h6>
+                                <small class="text-muted">High-tech MRI & Labs</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="d-flex align-items-center gap-3 p-3 bg-white rounded-3 shadow-sm border">
+                            <i class="fa-solid fa-clock text-primary fs-3"></i>
+                            <div>
+                                <h6 class="mb-0 fw-bold">24/7 Availability</h6>
+                                <small class="text-muted">Always ready to serve</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="d-flex align-items-center gap-3 p-3 bg-white rounded-3 shadow-sm border">
+                            <i class="fa-solid fa-laptop-medical text-primary fs-3"></i>
+                            <div>
+                                <h6 class="mb-0 fw-bold">Real-time Portal</h6>
+                                <small class="text-muted">Instant bookings & history</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Medical Departments Grid -->
+<section class="py-5 bg-white border-top border-bottom">
+    <div class="container">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-5">
+            <div>
+                <span class="text-primary fw-bold text-uppercase">Specialized Care</span>
+                <h2 class="fw-bold fs-1 mb-0">Explore Our Medical Departments</h2>
+            </div>
+            <a href="{% url 'department_list' %}" class="btn btn-outline-primary mt-3 mt-md-0">
+                View All Departments <i class="fa-solid fa-arrow-right ms-1"></i>
+            </a>
+        </div>
+
+        <div class="row g-4">
+            {% for dept in departments %}
+            <div class="col-lg-4 col-md-6">
+                <div class="medical-card p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="icon-box-lg mb-0">
+                            <i class="fa-solid {{ dept.icon_class }}"></i>
+                        </div>
+                        <span class="badge bg-light text-secondary rounded-pill px-3 py-2">
+                            <i class="fa-solid fa-user-md me-1"></i> {{ dept.doctor_count }} Doctors
+                        </span>
+                    </div>
+                    <h4 class="fw-bold mb-2">{{ dept.name }}</h4>
+                    <p class="text-muted small mb-3">{{ dept.description|truncatewords:15 }}</p>
+                    <a href="{% url 'department_detail' dept.id %}" class="fw-semibold text-primary">
+                        Learn More & Doctors <i class="fa-solid fa-chevron-right ms-1 small"></i>
+                    </a>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center py-4">
+                <p class="text-muted">Departments loading...</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Featured Doctors Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="text-center max-w-700 mx-auto mb-5">
+            <span class="text-primary fw-bold text-uppercase">Medical Team</span>
+            <h2 class="fw-bold fs-1">Meet Our Qualified Specialists</h2>
+            <p class="text-muted">Dedicated medical professionals committed to exceptional clinical outcomes and personalized care.</p>
+        </div>
+
+        <div class="row g-4">
+            {% for doctor in doctors %}
+            <div class="col-lg-3 col-md-6">
+                <div class="medical-card">
+                    <img src="{{ doctor.get_photo }}" alt="{{ doctor.name }}" class="doctor-card-img">
+                    <div class="p-4">
+                        <span class="doctor-badge mb-2">{{ doctor.specialization }}</span>
+                        <h5 class="fw-bold mb-1">Dr. {{ doctor.name }}</h5>
+                        <p class="small text-muted mb-2"><i class="fa-solid fa-building-columns me-1 text-primary"></i> {{ doctor.department.name }}</p>
+                        <p class="small text-muted mb-3"><i class="fa-solid fa-graduation-cap me-1"></i> {{ doctor.qualification }}</p>
+                        <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+                            <span class="fw-bold text-primary">${{ doctor.consultation_fee }}</span>
+                            <a href="{% url 'book_appointment' %}?doctor={{ doctor.id }}" class="btn btn-sm btn-primary">
+                                Book <i class="fa-solid fa-calendar-plus ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="text-center mt-5">
+            <a href="{% url 'doctor_list' %}" class="btn btn-primary btn-lg">
+                View All Doctors Directory <i class="fa-solid fa-user-doctor ms-2"></i>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Patient Live Statistics Counters -->
+<section class="py-5 bg-primary text-white position-relative">
+    <div class="container">
+        <div class="row text-center g-4">
+            <div class="col-md-3 col-6">
+                <h2 class="fw-extrabold display-5 mb-0" id="count-total-patients">{{ total_patients }}</h2>
+                <p class="fw-semibold text-white-50 text-uppercase mb-0">Satisfied Patients</p>
+            </div>
+            <div class="col-md-3 col-6">
+                <h2 class="fw-extrabold display-5 mb-0" id="count-total-doctors">{{ total_doctors }}</h2>
+                <p class="fw-semibold text-white-50 text-uppercase mb-0">Expert Doctors</p>
+            </div>
+            <div class="col-md-3 col-6">
+                <h2 class="fw-extrabold display-5 mb-0" id="count-total-departments">{{ total_departments }}</h2>
+                <p class="fw-semibold text-white-50 text-uppercase mb-0">Specialist Clinics</p>
+            </div>
+            <div class="col-md-3 col-6">
+                <h2 class="fw-extrabold display-5 mb-0" id="count-total-appointments">{{ total_appointments }}</h2>
+                <p class="fw-semibold text-white-50 text-uppercase mb-0">Appointments Handled</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Patient Testimonials -->
+<section class="py-5 bg-white">
+    <div class="container">
+        <div class="text-center max-w-700 mx-auto mb-5">
+            <span class="text-primary fw-bold text-uppercase">Testimonials</span>
+            <h2 class="fw-bold fs-1">What Our Patients Say</h2>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="medical-card p-4">
+                    <div class="text-warning mb-3">
+                        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                    </div>
+                    <p class="text-muted italic mb-4">"The online appointment booking and immediate response from Dr. Jenkins made my cardiology follow-up effortless. Extremely professional staff!"</p>
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="rounded-circle bg-light p-2 fw-bold text-primary">JD</div>
+                        <div>
+                            <h6 class="fw-bold mb-0">John Doe</h6>
+                            <small class="text-muted">Cardiology Patient</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="medical-card p-4">
+                    <div class="text-warning mb-3">
+                        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                    </div>
+                    <p class="text-muted italic mb-4">"Emergency care was swift when my child had a sudden high fever. The pediatric team is top tier. Highly recommend MedCare!"</p>
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="rounded-circle bg-light p-2 fw-bold text-primary">EW</div>
+                        <div>
+                            <h6 class="fw-bold mb-0">Emma Wilson</h6>
+                            <small class="text-muted">Pediatrics Parent</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="medical-card p-4">
+                    <div class="text-warning mb-3">
+                        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                    </div>
+                    <p class="text-muted italic mb-4">"Digital access to my medical history and prescriptions on the patient portal saves so much hassle. Seamless digital healthcare experience."</p>
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="rounded-circle bg-light p-2 fw-bold text-primary">AS</div>
+                        <div>
+                            <h6 class="fw-bold mb-0">Alex Smith</h6>
+                            <small class="text-muted">General Medicine Patient</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row g-5">
+            <div class="col-lg-5">
+                <span class="text-primary fw-bold text-uppercase">Contact Us</span>
+                <h2 class="fw-bold fs-1 mb-3">Get in Touch with MedCare</h2>
+                <p class="text-muted mb-4">Have questions about our services or need help booking an appointment? Reach out to our 24/7 helpdesk.</p>
+
+                <div class="d-flex align-items-start gap-3 mb-3">
+                    <i class="fa-solid fa-location-dot text-primary fs-4 mt-1"></i>
+                    <div>
+                        <h6 class="fw-bold mb-1">Main Location</h6>
+                        <p class="text-muted mb-0">742 Evergreen Healthcare Blvd, Metropolitan Metro</p>
+                    </div>
+                </div>
+                <div class="d-flex align-items-start gap-3 mb-3">
+                    <i class="fa-solid fa-phone text-primary fs-4 mt-1"></i>
+                    <div>
+                        <h6 class="fw-bold mb-1">Phone Line</h6>
+                        <p class="text-muted mb-0">+1 (800) 555-0199 / +1 (800) 555-9911</p>
+                    </div>
+                </div>
+                <div class="d-flex align-items-start gap-3">
+                    <i class="fa-solid fa-envelope text-primary fs-4 mt-1"></i>
+                    <div>
+                        <h6 class="fw-bold mb-1">Email Address</h6>
+                        <p class="text-muted mb-0">contact@medcarehospital.com</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-7">
+                <div class="medical-card p-4 p-md-5">
+                    <h4 class="fw-bold mb-4">Send Us a Direct Message</h4>
+                    <form action="#" method="POST" onsubmit="event.preventDefault(); alert('Thank you for contacting MedCare! We will respond shortly.');">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label font-weight-bold">Your Name</label>
+                                <input type="text" class="form-control" placeholder="Full name" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label font-weight-bold">Email Address</label>
+                                <input type="email" class="form-control" placeholder="name@example.com" required>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label font-weight-bold">Subject</label>
+                                <input type="text" class="form-control" placeholder="Inquiry subject" required>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label font-weight-bold">Message</label>
+                                <textarea class="form-control" rows="4" placeholder="How can we assist you?" required></textarea>
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary btn-lg w-100">
+                                    Send Message <i class="fa-solid fa-paper-plane ms-2"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

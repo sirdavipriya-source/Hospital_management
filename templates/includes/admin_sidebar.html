@@ -1,0 +1,46 @@
+<aside class="sidebar-nav shadow-sm bg-white p-3 rounded-4 border">
+    <div class="sidebar-section-title">Medical Staff & Org</div>
+    <a href="{% url 'doctor_admin' %}" class="sidebar-link {% if request.resolver_match.url_name == 'doctor_admin' %}active{% endif %}">
+        <i class="fa-solid fa-user-md text-primary"></i>
+        <span>Doctors Directory</span>
+    </a>
+    <a href="{% url 'specialization_list' %}" class="sidebar-link {% if 'specializations' in request.path %}active{% endif %}">
+        <i class="fa-solid fa-stethoscope text-secondary"></i>
+        <span>Specializations</span>
+    </a>
+    <a href="{% url 'department_admin' %}" class="sidebar-link {% if request.resolver_match.url_name == 'department_admin' %}active{% endif %}">
+        <i class="fa-solid fa-clinic-medical text-teal" style="color: #0d9488;"></i>
+        <span>Departments</span>
+    </a>
+
+    <div class="sidebar-section-title">Pharmacy & Clinical</div>
+    <a href="{% url 'medicine_list' %}" class="sidebar-link {% if 'pharmacy' in request.path and 'prescriptions' not in request.path %}active{% endif %}">
+        <i class="fa-solid fa-pills text-danger"></i>
+        <span>Pharmacy Inventory</span>
+    </a>
+    <a href="{% url 'prescription_list' %}" class="sidebar-link {% if 'prescriptions' in request.path %}active{% endif %}">
+        <i class="fa-solid fa-file-prescription text-warning" style="color: #f59e0b;"></i>
+        <span>Prescriptions (Rx)</span>
+    </a>
+
+    <div class="sidebar-section-title">Analytics & Config</div>
+    <a href="{% url 'reports' %}" class="sidebar-link {% if request.resolver_match.url_name == 'reports' %}active{% endif %}">
+        <i class="fa-solid fa-chart-pie text-success"></i>
+        <span>Reports Suite</span>
+    </a>
+    <a href="{% url 'profile' %}" class="sidebar-link {% if request.resolver_match.url_name == 'profile' %}active{% endif %}">
+        <i class="fa-solid fa-id-card text-muted"></i>
+        <span>Admin Profile</span>
+    </a>
+    <a href="/admin/" target="_blank" class="sidebar-link text-muted">
+        <i class="fa-solid fa-database text-warning"></i>
+        <span>Django DB Admin</span>
+    </a>
+
+    <hr class="my-3">
+    <a href="{% url 'logout' %}" class="sidebar-link text-danger">
+        <i class="fa-solid fa-right-from-bracket"></i>
+        <span>Sign Out</span>
+    </a>
+</aside>
+

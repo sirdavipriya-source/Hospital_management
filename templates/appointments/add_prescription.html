@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Prescription - Appointment #{{ appointment.id }} - MedCare{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="medical-card p-4 p-md-5">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3 class="fw-bold mb-0"><i class="fa-solid fa-notes-medical text-primary me-2"></i> Medical Prescription & Diagnosis</h3>
+                    <a href="{% url 'doctor_dashboard' %}" class="btn btn-outline-secondary btn-sm">Back</a>
+                </div>
+
+                <!-- Appointment Summary -->
+                <div class="p-3 bg-light rounded-3 mb-4">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <small class="text-muted d-block">Patient</small>
+                            <span class="fw-bold">{{ appointment.patient.get_full_name|default:appointment.patient.username }}</span>
+                        </div>
+                        <div class="col-md-6">
+                            <small class="text-muted d-block">Doctor</small>
+                            <span class="fw-bold">Dr. {{ appointment.doctor.name }}</span>
+                        </div>
+                        <div class="col-md-6">
+                            <small class="text-muted d-block">Date & Time</small>
+                            <span class="fw-bold">{{ appointment.appointment_date }} at {{ appointment.appointment_time|time:"h:i A" }}</span>
+                        </div>
+                        <div class="col-md-6">
+                            <small class="text-muted d-block">Reported Symptoms</small>
+                            <span class="fw-semibold text-muted">{{ appointment.symptoms|default:'None specified' }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <form method="POST" action="">
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Clinical Diagnosis *</label>
+                        {{ form.diagnosis }}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Prescription Details (Medicines & Dosage) *</label>
+                        {{ form.prescription }}
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Additional Medical Notes / Instructions</label>
+                        {{ form.medical_notes }}
+                    </div>
+
+                    <div class="alert alert-info small">
+                        <i class="fa-solid fa-circle-info me-2"></i> Saving this prescription will automatically mark the appointment as <strong>Completed</strong>.
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fa-solid fa-floppy-disk me-2"></i> Save Prescription & Complete Appointment
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

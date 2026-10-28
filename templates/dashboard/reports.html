@@ -1,0 +1,302 @@
+{% extends 'base.html' %}
+
+{% block title %}System Reports Suite - MedCare Healthcare{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+    {% include 'includes/admin_sidebar.html' %}
+
+    <div class="dashboard-content">
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2 no-print">
+            <div>
+                <h2 class="fw-bold mb-1"><i class="fa-solid fa-chart-pie text-success me-2"></i>Comprehensive Reports Suite</h2>
+                <p class="text-muted mb-0">Exportable clinical data reports, pharmacy stock valuations, doctor directories, and department matrices.</p>
+            </div>
+            <div class="d-flex gap-2">
+                <button type="button" class="btn btn-outline-dark btn-sm px-3" onclick="window.print()">
+                    <i class="fa-solid fa-print me-1"></i> Print / Save as PDF
+                </button>
+            </div>
+        </div>
+
+        <!-- Report Tabs & Filter Bar -->
+        <div class="filter-card no-print">
+            <form method="GET" class="row g-2 align-items-center">
+                <div class="col-md-4">
+                    <label class="form-label small fw-bold text-muted mb-1">Select Report Type</label>
+                    <select name="report" class="form-select fw-semibold" onchange="this.form.submit()">
+                        <option value="overview" {% if report_type == 'overview' %}selected{% endif %}>📊 Executive Overview Report</option>
+                        <option value="doctors" {% if report_type == 'doctors' %}selected{% endif %}>👨‍⚕️ Doctor Roster Report</option>
+                        <option value="departments" {% if report_type == 'departments' %}selected{% endif %}>🏥 Department & Services Report</option>
+                        <option value="specializations" {% if report_type == 'specializations' %}selected{% endif %}>🩺 Specializations Report</option>
+                        <option value="medicines" {% if report_type == 'medicines' %}selected{% endif %}>💊 Pharmacy Medicine Stock Report</option>
+                        <option value="expired" {% if report_type == 'expired' %}selected{% endif %}>⚠️ Expired Medicines Report</option>
+                        <option value="prescriptions" {% if report_type == 'prescriptions' %}selected{% endif %}>📝 Clinical Prescriptions (Rx) Report</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold text-muted mb-1">From Date</label>
+                    <input type="date" name="start_date" class="form-control" value="{{ start_date }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold text-muted mb-1">To Date</label>
+                    <input type="date" name="end_date" class="form-control" value="{{ end_date }}">
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100" style="margin-top: 24px;"><i class="fa-solid fa-arrows-rotate me-1"></i> Generate</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Printable Report Content Area -->
+        <div class="printable-area bg-white p-4 p-md-5 rounded-4 shadow-sm border">
+            <!-- Report Title & Header -->
+            <div class="d-flex justify-content-between align-items-start border-bottom pb-3 mb-4">
+                <div>
+                    <h4 class="fw-bold mb-1 text-dark">
+                        {% if report_type == 'doctors' %}👨‍⚕️ Medical Doctor Roster & Practice Report
+                        {% elif report_type == 'departments' %}🏥 Hospital Department & Resource Report
+                        {% elif report_type == 'specializations' %}🩺 Medical Specialization & Faculty Report
+                        {% elif report_type == 'medicines' %}💊 Pharmacy Stock & Valuation Report
+                        {% elif report_type == 'expired' %}⚠️ Expired & Critical Pharmacy Alert Report
+                        {% elif report_type == 'prescriptions' %}📝 Clinical Prescriptions & Dispensing Report
+                        {% else %}📊 MedCare Hospital Executive Report
+                        {% endif %}
+                    </h4>
+                    <p class="text-muted small mb-0">Generated on: {{ today|date:"F d, Y" }} | System Status: Active</p>
+                </div>
+                <div class="text-end">
+                    <span class="badge bg-primary fs-6 px-3 py-2">MedCare Official</span>
+                </div>
+            </div>
+
+            <!-- EXECUTIVE OVERVIEW -->
+            {% if report_type == 'overview' %}
+            <div class="row g-3 mb-4">
+                <div class="col-md-4 col-12">
+                    <div class="p-3 bg-light rounded-3 text-center border">
+                        <small class="text-muted text-uppercase fw-bold">Total Doctors</small>
+                        <h3 class="fw-bold text-primary mb-0">{{ doctors.count }}</h3>
+                    </div>
+                </div>
+                <div class="col-md-4 col-12">
+                    <div class="p-3 bg-light rounded-3 text-center border">
+                        <small class="text-muted text-uppercase fw-bold">Departments</small>
+                        <h3 class="fw-bold text-dark mb-0">{{ departments.count }}</h3>
+                    </div>
+                </div>
+                <div class="col-md-4 col-12">
+                    <div class="p-3 bg-light rounded-3 text-center border">
+                        <small class="text-muted text-uppercase fw-bold">Pharmacy Inventory</small>
+                        <h3 class="fw-bold text-success mb-0">${{ total_inventory_value|floatformat:2 }}</h3>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- DOCTOR REPORT -->
+            {% if report_type == 'doctors' or report_type == 'overview' %}
+            <div class="mb-5">
+                <h5 class="fw-bold text-dark mb-3"><i class="fa-solid fa-user-md text-primary me-2"></i>Medical Doctor Directory</h5>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped align-middle mb-0">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Doctor ID</th>
+                                <th>Name</th>
+                                <th>Department</th>
+                                <th>Specialization</th>
+                                <th>Qualification</th>
+                                <th>Experience</th>
+                                <th>Phone</th>
+                                <th>Fee</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for doc in doctors %}
+                            <tr>
+                                <td>{{ doc.doctor_id|default:doc.id }}</td>
+                                <td class="fw-bold">Dr. {{ doc.name }}</td>
+                                <td>{{ doc.department.name|default:"General" }}</td>
+                                <td>{{ doc.get_specialization_name }}</td>
+                                <td>{{ doc.qualification }}</td>
+                                <td>{{ doc.experience }} Yrs</td>
+                                <td>{{ doc.phone }}</td>
+                                <td>${{ doc.consultation_fee|floatformat:2 }}</td>
+                                <td>{{ doc.status }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- MEDICINE STOCK REPORT -->
+            {% if report_type == 'medicines' or report_type == 'overview' %}
+            <div class="mb-5">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold text-dark mb-0"><i class="fa-solid fa-pills text-danger me-2"></i>Pharmacy Medicine Stock Report</h5>
+                    <span class="badge bg-success">Total Inventory Value: ${{ total_inventory_value|floatformat:2 }}</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped align-middle mb-0">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Medicine ID</th>
+                                <th>Brand Name</th>
+                                <th>Generic Name</th>
+                                <th>Category</th>
+                                <th>Batch No.</th>
+                                <th>Stock Units</th>
+                                <th>Unit Price</th>
+                                <th>Expiry Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for med in medicines %}
+                            <tr>
+                                <td>{{ med.medicine_id|default:med.id }}</td>
+                                <td class="fw-bold">{{ med.name }}</td>
+                                <td>{{ med.generic_name|default:"-" }}</td>
+                                <td>{{ med.category.name|default:med.category_name|default:"General" }}</td>
+                                <td>{{ med.batch_number|default:"-" }}</td>
+                                <td class="fw-bold {% if med.quantity < 15 %}text-warning{% endif %}">{{ med.quantity }}</td>
+                                <td>${{ med.unit_price|floatformat:2 }}</td>
+                                <td class="{% if med.is_expired %}text-danger fw-bold{% endif %}">{{ med.expiry_date|default:"-" }}</td>
+                                <td>{{ med.status }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- EXPIRED MEDICINES REPORT -->
+            {% if report_type == 'expired' %}
+            <div class="mb-5">
+                <h5 class="fw-bold text-danger mb-3"><i class="fa-solid fa-skull-crossbones text-danger me-2"></i>Expired Medicine Disposal Report</h5>
+                <div class="table-responsive">
+                    <table class="table table-bordered align-middle mb-0">
+                        <thead class="table-danger">
+                            <tr>
+                                <th>Medicine ID</th>
+                                <th>Brand Name</th>
+                                <th>Generic Name</th>
+                                <th>Manufacturer</th>
+                                <th>Batch No.</th>
+                                <th>Expired Units</th>
+                                <th>Expiry Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for med in expired_medicines %}
+                            <tr>
+                                <td>{{ med.medicine_id }}</td>
+                                <td class="fw-bold text-danger">{{ med.name }}</td>
+                                <td>{{ med.generic_name }}</td>
+                                <td>{{ med.manufacturer }}</td>
+                                <td>{{ med.batch_number }}</td>
+                                <td class="fw-bold text-danger">{{ med.quantity }}</td>
+                                <td class="text-danger fw-bold">{{ med.expiry_date }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="7" class="text-center text-success py-3"><i class="fa-solid fa-circle-check me-1"></i> No expired medicines found in inventory!</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- PRESCRIPTIONS REPORT -->
+            {% if report_type == 'prescriptions' %}
+            <div class="mb-5">
+                <h5 class="fw-bold text-dark mb-3"><i class="fa-solid fa-file-prescription text-warning me-2"></i>Clinical Prescriptions Report</h5>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped align-middle mb-0">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Rx ID</th>
+                                <th>Patient Name</th>
+                                <th>Doctor</th>
+                                <th>Department</th>
+                                <th>Date</th>
+                                <th>Diagnosis</th>
+                                <th>Medicines Prescribed</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for rx in prescriptions %}
+                            <tr>
+                                <td class="fw-bold text-primary">{{ rx.prescription_id }}</td>
+                                <td>{{ rx.patient_name }}</td>
+                                <td>Dr. {{ rx.doctor.name }}</td>
+                                <td>{{ rx.department.name|default:rx.doctor.department.name }}</td>
+                                <td>{{ rx.prescription_date }}</td>
+                                <td><small>{{ rx.diagnosis|truncatechars:80 }}</small></td>
+                                <td>
+                                    {% for item in rx.items.all %}
+                                        <small class="d-block">{{ item.medicine.name }} ({{ item.dosage }}, {{ item.frequency }})</small>
+                                    {% endfor %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- DEPARTMENT & SPECIALIZATION REPORT -->
+            {% if report_type == 'departments' or report_type == 'specializations' %}
+            <div class="mb-5">
+                <h5 class="fw-bold text-dark mb-3"><i class="fa-solid fa-clinic-medical text-primary me-2"></i>Department & Specialization Matrix</h5>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped align-middle mb-0">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Department</th>
+                                <th>Code</th>
+                                <th>Specialization Fields</th>
+                                <th>Doctors Active</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for dept in departments %}
+                            <tr>
+                                <td class="fw-bold">{{ dept.name }}</td>
+                                <td>{{ dept.code|default:"-" }}</td>
+                                <td>
+                                    {% for spec in dept.specializations.all %}
+                                        <span class="badge bg-light text-dark border me-1">{{ spec.name }}</span>
+                                    {% empty %}
+                                        <small class="text-muted">No specific sub-specialization registered</small>
+                                    {% endfor %}
+                                </td>
+                                <td class="fw-bold text-primary">{{ dept.doctors.count }}</td>
+                                <td>{% if dept.is_active %}Active{% else %}Inactive{% endif %}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Footer Sign-off -->
+            <div class="d-flex justify-content-between align-items-center pt-4 border-top mt-4">
+                <small class="text-muted">MedCare Healthcare Management System - Confidential Internal Report</small>
+                <small class="text-muted">Page 1 of 1</small>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+{% endblock %}

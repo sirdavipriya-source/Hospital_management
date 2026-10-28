@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title|default:'User Login' }} - MedCare Hospital{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="medical-card p-4 p-md-5">
+                <div class="text-center mb-4">
+                    <div class="icon-box-lg mx-auto mb-3">
+                        <i class="fa-solid {% if is_doctor_login %}fa-user-md text-success{% elif is_admin_login %}fa-shield-halved text-danger{% else %}fa-user-lock text-primary{% endif %}"></i>
+                    </div>
+                    <span class="badge {% if is_doctor_login %}bg-success-subtle text-success{% elif is_admin_login %}bg-danger-subtle text-danger{% else %}bg-primary-subtle text-primary{% endif %} mb-2">
+                        {{ role_badge|default:'Patient & User Access' }}
+                    </span>
+                    <h3 class="fw-bold mb-1">{{ title|default:'Welcome Back' }}</h3>
+                    <p class="text-muted small">Enter your credentials to access your healthcare dashboard.</p>
+                </div>
+
+                <form method="POST" action="">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label class="form-label font-weight-bold">Username or Email</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-user text-muted"></i></span>
+                            {{ form.username }}
+                        </div>
+                        {% if form.username.errors %}<div class="text-danger small mt-1">{{ form.username.errors.0 }}</div>{% endif %}
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <label class="form-label font-weight-bold mb-0">Password</label>
+                            <a href="#" class="small text-primary">Forgot Password?</a>
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-lock text-muted"></i></span>
+                            {{ form.password }}
+                        </div>
+                        {% if form.password.errors %}<div class="text-danger small mt-1">{{ form.password.errors.0 }}</div>{% endif %}
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-lg w-100 mb-3">
+                        <i class="fa-solid fa-right-to-bracket me-2"></i> Sign In
+                    </button>
+                </form>
+
+                <!-- Quick Portal Switcher -->
+                <div class="border-top pt-4 mt-3">
+                    <p class="text-muted small text-center mb-2">Are you logging in as staff or specialist?</p>
+                    <div class="d-flex justify-content-center gap-2">
+                        <a href="{% url 'login' %}" class="btn btn-sm btn-outline-secondary">Patient Portal</a>
+                        <a href="{% url 'doctor_login' %}" class="btn btn-sm btn-outline-success">Doctor Portal</a>
+                        <a href="{% url 'admin_login' %}" class="btn btn-sm btn-outline-danger">Admin Portal</a>
+                    </div>
+                </div>
+
+                {% if not is_doctor_login and not is_admin_login %}
+                <div class="text-center mt-4 pt-2 border-top">
+                    <p class="text-muted small mb-0">Don't have a patient account yet?</p>
+                    <a href="{% url 'register' %}" class="fw-bold text-primary">Register New Patient Account <i class="fa-solid fa-arrow-right ms-1"></i></a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

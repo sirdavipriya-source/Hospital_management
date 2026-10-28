@@ -1,0 +1,211 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="MedCare - Premier Real-time Hospital Management System providing world-class healthcare, specialist doctors, and digital appointment booking.">
+    <title>{% block title %}MedCare - Modern Hospital Management System{% endblock %}</title>
+
+    <!-- Google Fonts (Inter) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Custom Theme CSS -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+    <!-- Chart.js for Dashboards -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+    <!-- Modern Sticky Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-custom">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'home' %}">
+                <i class="fa-solid fa-hospital"></i>
+                <span>MedCare<span class="text-primary">+</span></span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain" aria-controls="navbarMain" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarMain">
+                <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'home' %}">
+                            <i class="fa-solid fa-house me-1"></i> Home
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'about' %}active{% endif %}" href="{% url 'about' %}">
+                            <i class="fa-solid fa-circle-info me-1"></i> About Us
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if 'department' in request.path %}active{% endif %}" href="{% url 'department_list' %}">
+                            <i class="fa-solid fa-clinic-medical me-1"></i> Departments
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if 'doctor' in request.path and 'login' not in request.path and 'dashboard' not in request.path %}active{% endif %}" href="{% url 'doctor_list' %}">
+                            <i class="fa-solid fa-user-md me-1"></i> Doctors
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if 'book' in request.path %}active{% endif %}" href="{% url 'book_appointment' %}">
+                            <i class="fa-solid fa-calendar-check me-1"></i> Appointments
+                        </a>
+                    </li>
+                </ul>
+
+                <div class="d-flex align-items-center gap-2">
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'dashboard_redirect' %}" class="btn btn-outline-primary shadow-sm">
+                            <i class="fa-solid fa-chart-line me-1"></i> Dashboard
+                        </a>
+                        <div class="dropdown">
+                            <button class="btn btn-primary dropdown-toggle d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fa-solid fa-user-circle fs-5"></i>
+                                <span>{{ user.first_name|default:user.username }}</span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end shadow">
+                                <li>
+                                    <span class="dropdown-header">
+                                        Role: 
+                                        {% if is_admin %}<strong class="text-danger">Admin</strong>
+                                        {% elif is_doctor %}<strong class="text-success">Doctor</strong>
+                                        {% else %}<strong class="text-info">Patient</strong>{% endif %}
+                                    </span>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{% url 'profile' %}"><i class="fa-solid fa-id-card me-2"></i> My Profile</a></li>
+                                <li><a class="dropdown-item" href="{% url 'appointment_list' %}"><i class="fa-solid fa-list-check me-2"></i> Appointments</a></li>
+                                {% if is_admin %}
+                                    <li><a class="dropdown-item" href="{% url 'doctor_admin' %}"><i class="fa-solid fa-user-md me-2 text-primary"></i> Doctors Directory</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'department_admin' %}"><i class="fa-solid fa-clinic-medical me-2 text-teal"></i> Departments</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'specialization_list' %}"><i class="fa-solid fa-stethoscope me-2 text-secondary"></i> Specializations</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'medicine_list' %}"><i class="fa-solid fa-pills me-2 text-danger"></i> Pharmacy Stock</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'prescription_list' %}"><i class="fa-solid fa-file-prescription me-2 text-warning"></i> Prescriptions</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'reports' %}"><i class="fa-solid fa-chart-pie me-2 text-success"></i> Reports Suite</a></li>
+                                {% elif is_doctor %}
+                                    <li><a class="dropdown-item" href="{% url 'prescription_list' %}"><i class="fa-solid fa-file-prescription me-2 text-warning"></i> Prescriptions</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'medicine_list' %}"><i class="fa-solid fa-pills me-2 text-danger"></i> Pharmacy Medicines</a></li>
+                                {% elif is_patient %}
+                                    <li><a class="dropdown-item" href="{% url 'medical_history' %}"><i class="fa-solid fa-notes-medical me-2"></i> Medical Records</a></li>
+                                {% endif %}
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger" href="{% url 'logout' %}"><i class="fa-solid fa-right-from-bracket me-2"></i> Logout</a></li>
+                            </ul>
+                        </div>
+                    {% else %}
+                        <a href="{% url 'login' %}" class="btn btn-outline-primary">
+                            <i class="fa-solid fa-right-to-bracket me-1"></i> Login
+                        </a>
+                        <a href="{% url 'register' %}" class="btn btn-primary">
+                            <i class="fa-solid fa-user-plus me-1"></i> Register
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Flash Messages Container -->
+    {% if messages %}
+    <div class="container mt-3">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show shadow-sm" role="alert">
+            <i class="fa-solid {% if message.tags == 'success' %}fa-circle-check text-success{% elif message.tags == 'error' %}fa-triangle-exclamation text-danger{% else %}fa-circle-info text-info{% endif %} me-2 fs-5"></i>
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Main Content -->
+    <main class="flex-grow-1">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Professional Footer -->
+    <footer class="footer-custom mt-5">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-lg-4 col-md-6">
+                    <h5 class="d-flex align-items-center gap-2">
+                        <i class="fa-solid fa-hospital text-primary fs-4"></i>
+                        <span>MedCare Medical Center</span>
+                    </h5>
+                    <p class="small text-secondary mt-3">
+                        Providing compassionate, innovative, and patient-centered healthcare for over 25 years. Our multi-specialty center operates 24/7 with world-class facilities and expert medical practitioners.
+                    </p>
+                    <div class="d-flex gap-3 mt-3 fs-5">
+                        <a href="#" class="footer-link"><i class="fa-brands fa-facebook"></i></a>
+                        <a href="#" class="footer-link"><i class="fa-brands fa-twitter"></i></a>
+                        <a href="#" class="footer-link"><i class="fa-brands fa-linkedin"></i></a>
+                        <a href="#" class="footer-link"><i class="fa-brands fa-instagram"></i></a>
+                    </div>
+                </div>
+
+                <div class="col-lg-2 col-md-6">
+                    <h5>Quick Links</h5>
+                    <a href="{% url 'home' %}" class="footer-link"><i class="fa-solid fa-angle-right me-1"></i> Home</a>
+                    <a href="{% url 'about' %}" class="footer-link"><i class="fa-solid fa-angle-right me-1"></i> About Us</a>
+                    <a href="{% url 'department_list' %}" class="footer-link"><i class="fa-solid fa-angle-right me-1"></i> Departments</a>
+                    <a href="{% url 'doctor_list' %}" class="footer-link"><i class="fa-solid fa-angle-right me-1"></i> Our Doctors</a>
+                    <a href="{% url 'book_appointment' %}" class="footer-link"><i class="fa-solid fa-angle-right me-1"></i> Book Consultation</a>
+                </div>
+
+                <div class="col-lg-3 col-md-6">
+                    <h5>Specialist Centers</h5>
+                    <span class="footer-link"><i class="fa-solid fa-heartbeat me-1"></i> Cardiovascular Institute</span>
+                    <span class="footer-link"><i class="fa-solid fa-brain me-1"></i> Neurosciences & Brain Center</span>
+                    <span class="footer-link"><i class="fa-solid fa-bone me-1"></i> Orthopedics & Joint Surgery</span>
+                    <span class="footer-link"><i class="fa-solid fa-baby me-1"></i> Children Care & Pediatrics</span>
+                    <span class="footer-link"><i class="fa-solid fa-ambulance me-1"></i> 24/7 Trauma Emergency Care</span>
+                </div>
+
+                <div class="col-lg-3 col-md-6">
+                    <h5>24/7 Emergency Line</h5>
+                    <div class="p-3 bg-dark rounded border border-secondary mb-3">
+                        <div class="text-danger font-weight-bold fs-5"><i class="fa-solid fa-phone-volume me-2"></i> +1 (800) 555-9911</div>
+                        <div class="small text-muted mt-1">Immediate Ambulance & Critical Response</div>
+                    </div>
+                    <p class="small text-secondary mb-1"><i class="fa-solid fa-location-dot me-2 text-primary"></i> 742 Evergreen Healthcare Blvd, Metropolitan Metro</p>
+                    <p class="small text-secondary"><i class="fa-solid fa-envelope me-2 text-primary"></i> contact@medcarehospital.com</p>
+                </div>
+            </div>
+
+            <hr class="border-secondary my-4">
+
+            <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center small text-secondary">
+                <p class="mb-0">&copy; 2026 MedCare Hospital Management System. All Rights Reserved.</p>
+                <div class="d-flex gap-3">
+                    <a href="#" class="footer-link">Privacy Policy</a>
+                    <a href="#" class="footer-link">Terms of Service</a>
+                    <a href="#" class="footer-link">Patient Portal</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Custom Real-time JS -->
+    <script src="{% static 'js/real_time.js' %}"></script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

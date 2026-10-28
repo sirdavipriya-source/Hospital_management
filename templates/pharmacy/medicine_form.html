@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }} - MedCare Pharmacy{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+    {% include 'includes/admin_sidebar.html' %}
+
+    <div class="dashboard-content">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 bg-white">
+                    <div class="d-flex align-items-center justify-content-between mb-4 pb-3 border-bottom">
+                        <h4 class="fw-bold mb-0 text-dark">
+                            <i class="fa-solid fa-pills text-danger me-2"></i>{{ title }}
+                        </h4>
+                        <a href="{% url 'medicine_list' %}" class="btn btn-outline-secondary btn-sm">
+                            <i class="fa-solid fa-arrow-left me-1"></i> Back to Pharmacy
+                        </a>
+                    </div>
+
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Medicine Brand Name <span class="text-danger">*</span></label>
+                                {{ form.name }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Generic Name</label>
+                                {{ form.generic_name }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Medicine ID / SKU</label>
+                                {{ form.medicine_id }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Category</label>
+                                {{ form.category }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Manufacturer</label>
+                                {{ form.manufacturer }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Batch Number</label>
+                                {{ form.batch_number }}
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Quantity / Units <span class="text-danger">*</span></label>
+                                {{ form.quantity }}
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Unit Price ($) <span class="text-danger">*</span></label>
+                                {{ form.unit_price }}
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Expiry Date</label>
+                                {{ form.expiry_date }}
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label fw-semibold">Usage & Indications</label>
+                                {{ form.description }}
+                            </div>
+                            <div class="col-12 mt-4 d-flex gap-2">
+                                <button type="submit" class="btn btn-danger px-4"><i class="fa-solid fa-save me-1"></i> Save Medicine</button>
+                                <a href="{% url 'medicine_list' %}" class="btn btn-light px-4">Cancel</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

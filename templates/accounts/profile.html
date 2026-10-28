@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block title %}My Profile - MedCare Hospital{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row g-4">
+        <div class="col-lg-4">
+            <div class="medical-card p-4 text-center">
+                {% if profile.profile_picture %}
+                    <img src="{{ profile.profile_picture.url }}" alt="{{ user.username }}" class="rounded-circle mb-3 border border-3 border-primary" style="width: 130px; height: 130px; object-fit: cover;">
+                {% else %}
+                    <div class="icon-box-lg mx-auto mb-3" style="width: 100px; height: 100px; font-size: 2.5rem;">
+                        <i class="fa-solid fa-user text-primary"></i>
+                    </div>
+                {% endif %}
+
+                <h4 class="fw-bold mb-1">{{ user.get_full_name|default:user.username }}</h4>
+                <span class="badge bg-primary-subtle text-primary fw-bold mb-3 px-3 py-2">
+                    {{ profile.get_role_display|default:'Patient' }}
+                </span>
+
+                <div class="text-start border-top pt-3 mt-2">
+                    <p class="small text-muted mb-2"><i class="fa-solid fa-envelope me-2 text-primary"></i> {{ user.email }}</p>
+                    <p class="small text-muted mb-2"><i class="fa-solid fa-phone me-2 text-primary"></i> {{ profile.phone|default:'Not provided' }}</p>
+                    <p class="small text-muted mb-2"><i class="fa-solid fa-calendar me-2 text-primary"></i> DOB: {{ profile.date_of_birth|default:'Not provided' }}</p>
+                    <p class="small text-muted mb-0"><i class="fa-solid fa-location-dot me-2 text-primary"></i> {{ profile.address|default:'No address specified' }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="medical-card p-4 p-md-5">
+                <h4 class="fw-bold mb-4"><i class="fa-solid fa-user-gear text-primary me-2"></i> Update Profile Information</h4>
+
+                <form method="POST" enctype="multipart/form-data" action="">
+                    {% csrf_token %}
+
+                    <h6 class="text-primary fw-bold mb-3">Basic User Information</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label font-weight-bold">First Name</label>
+                            {{ u_form.first_name }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label font-weight-bold">Last Name</label>
+                            {{ u_form.last_name }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label font-weight-bold">Email Address</label>
+                            {{ u_form.email }}
+                        </div>
+                    </div>
+
+                    <h6 class="text-primary fw-bold mb-3">Contact & Demographic Details</h6>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label font-weight-bold">Phone Number</label>
+                            {{ p_form.phone }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label font-weight-bold">Gender</label>
+                            {{ p_form.gender }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label font-weight-bold">Date of Birth</label>
+                            {{ p_form.date_of_birth }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label font-weight-bold">Profile Picture</label>
+                            {{ p_form.profile_picture }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label font-weight-bold">Address</label>
+                            {{ p_form.address }}
+                        </div>
+                    </div>
+
+                    <div class="mt-4 pt-2">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fa-solid fa-floppy-disk me-2"></i> Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

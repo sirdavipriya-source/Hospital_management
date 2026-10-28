@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }} - MedCare Admin{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="medical-card p-4 p-md-5">
+                <div class="d-flex align-items-center justify-content-between mb-4">
+                    <h3 class="fw-bold mb-0"><i class="fa-solid fa-clinic-medical text-primary me-2"></i> {{ title }}</h3>
+                    <a href="{% url 'department_admin' %}" class="btn btn-outline-secondary btn-sm">Back to Departments</a>
+                </div>
+
+                <form method="POST" enctype="multipart/form-data" action="">
+                    {% csrf_token %}
+
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <label class="form-label font-weight-bold">Department Name *</label>
+                            {{ form.name }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label font-weight-bold">Department Code</label>
+                            {{ form.code }}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label font-weight-bold">Icon FontAwesome Class</label>
+                            {{ form.icon_class }}
+                            <small class="text-muted">e.g. fa-heartbeat, fa-brain, fa-bone</small>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label font-weight-bold">Status</label>
+                            <div class="form-check form-switch mt-2">
+                                {{ form.is_active }}
+                                <label class="form-check-label font-weight-bold" for="id_is_active">Department Active</label>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label font-weight-bold">Description *</label>
+                            {{ form.description }}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label font-weight-bold">Upload Image File</label>
+                            {{ form.image }}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label font-weight-bold">Remote Image URL (Fallback)</label>
+                            {{ form.image_url }}
+                        </div>
+                    </div>
+
+                    <div class="mt-4 pt-2 border-top">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fa-solid fa-floppy-disk me-2"></i> Save Department
+                        </button>
+                        <a href="{% url 'department_admin' %}" class="btn btn-light btn-lg ms-2">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
